@@ -1,0 +1,13 @@
+<div class="list">
+  {% for r in routines %}
+  <div class="list-row" data-cat="{{ r.category }}">
+    <span class="dot"></span>
+    <span class="grow">{{ r.title }}<div class="hint">{{ r.minutes }} min &middot; {{ r.where }}</div></span>
+    <form hx-post="/routines/{{ r.id }}/delete" hx-target="#routines-list" hx-swap="innerHTML" style="margin:0;">
+      <button class="btn btn-sm btn-ghost btn-danger" type="submit">Remove</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="list-row muted">No routines yet.</div>
+  {% endfor %}
+</div>

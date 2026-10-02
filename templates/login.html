@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sign in — Day Planner</title>
+  <link rel="stylesheet" href="/static/css/globals.css" />
+</head>
+<body>
+  <div class="shell" style="max-width:420px; padding-top:20vh;">
+    <div class="eyebrow">Day Planner</div>
+    <h1 class="title">Departure board for your day</h1>
+    <p class="hint">School, music, activities and travel time, planned automatically each morning.</p>
+    <div class="stack" style="margin-top:24px;">
+      {% if google_configured %}
+      <a class="btn btn-primary btn-block" href="/auth/google">Continue with Google</a>
+      {% endif %}
+      <a class="btn btn-block {% if not google_configured %}btn-primary{% endif %}" href="/auth/demo">Try the demo</a>
+    </div>
+    {% if demo %}
+    <p class="hint" style="margin-top:16px;">No Google or database keys are configured, so this instance runs in demo mode with sample data.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

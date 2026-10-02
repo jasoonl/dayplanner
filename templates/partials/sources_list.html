@@ -1,0 +1,12 @@
+<div class="list">
+  {% for s in sources %}
+  <div class="list-row">
+    <span class="grow">{{ s.label }}<div class="hint">{{ s.kind }} &middot; {{ s.item_count or 0 }} items{% if s.last_error %} &middot; <span style="color:var(--danger)">{{ s.last_error }}</span>{% endif %}</div></span>
+    <form hx-post="/sources/{{ s.id }}/delete" hx-target="#sources-list" hx-swap="innerHTML" style="margin:0;">
+      <button class="btn btn-sm btn-ghost btn-danger" type="submit">Remove</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="list-row muted">No feeds yet.</div>
+  {% endfor %}
+</div>

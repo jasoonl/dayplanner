@@ -1,0 +1,95 @@
+<div class="topbar">
+  <div>
+    <div class="eyebrow">{{ date }}{% if not is_today %} &middot; not today{% endif %}</div>
+    <h1 class="title">Today</h1>
+  </div>
+  <button class="btn btn-sm" hx-post="/plan/build" hx-vals='{"date": "{{ date }}"}' hx-target="#today-root" hx-swap="innerHTML">
+    Replan
+  </button>
+</div>
+
+{% if google_auth_error %}
+<div class="warnings"><div class="warn danger">{{ google_auth_error }}</div></div>
+{% endif %}
+
+{% if not checkin_done and is_today %}
+<div class="card card-pad" style="margin-bottom:16px;">
+  <div class="row" style="justify-content: space-between;">
+    <div>
+      <b>Morning check-in</b>
+      <div class="hint">Tell it what's on your plate and build today's schedule.</div>
+    </div>
+    <a class="btn btn-signal" href="/checkin">Check in</a>
+  </div>
+</div>
+{% endif %}
+
+{% if briefing %}
+<p class="briefing">{{ briefing }}</p>
+{% endif %}
+
+<div class="card card-pad">
+  <div class="stats">
+    <div><b>{{ (stats.focusMin / 60) | round(1) }}h</b><span>Focus</span></div>
+    <div><b>{{ stats.travelMin }}m</b><span>Travel</span></div>
+    <div><b>{{ stats.freeMin }}m</b><span>Free</span></div>
+  </div>
+</div>
+
+{% if warnings %}
+<div class="warnings">
+  {% for w in warnings %}
+  <div class="warn {% if w.kind in ['conflict','late'] %}danger{% endif %}">{{ w.message }}</div>
+  {% endfor %}
+  {% if more_warnings > 0 %}
+  <div class="warn"><a href="/week">+{{ more_warnings }} more &mdash; see Week</a></div>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="h2">Schedule</div>
+<div class="timeline">
+  {% for b in blocks %}
+  <div class="tl-row">
+    <div class="tl-time {% if b.isPast %}dim{% endif %}">{{ b.startFmt }}</div>
+    <div class="tl-block k-{{ b.kind }} {% if b.isPast %}past{% endif %} {% if b.isCurrent %}current{% endif %} {% if b.isDone %}done{% endif %} {% if b.late %}late{% endif %}"
+         {% if b.category %}data-cat="{{ b.category }}"{% endif %}>
+      <div class="t">{{ b.title }}{% if b.onTransit %} <span class="chip">on the ride</span>{% endif %}</div>
+      {% if b.subtitle %}<div class="s">{{ b.subtitle }}</div>{% endif %}
+      <div class="s">{{ b.startFmt }}&ndash;{{ b.endFmt }}</div>
+      {% if b.kind in ['task', 'routine'] and not b.isPast %}
+      <div class="row" style="margin-top:8px;">
+        <form hx-post="/blocks/complete" hx-target="#today-root" hx-swap="innerHTML" style="margin:0;">
+          <input type="hidden" name="date" value="{{ date }}">
+          <input type="hidden" name="blockId" value="{{ b.id }}">
+          {% if b.taskId %}<input type="hidden" name="taskId" value="{{ b.taskId }}">{% endif %}
+          {% if b.routineId %}<input type="hidden" name="routineId" value="{{ b.routineId }}">{% endif %}
+          <input type="hidden" name="start" value="{{ b.start }}">
+          <input type="hidden" name="minutes" value="{{ ((b.end - b.start) / 60000) | round | int }}">
+          <input type="hidden" name="finished" value="true">
+          <button class="btn btn-sm" type="submit">Done</button>
+        </form>
+        <form hx-post="/blocks/skip" hx-target="#today-root" hx-swap="innerHTML" style="margin:0;">
+          <input type="hidden" name="date" value="{{ date }}">
+          {% if b.taskId %}<input type="hidden" name="taskId" value="{{ b.taskId }}">{% endif %}
+          {% if b.routineId %}<input type="hidden" name="routineId" value="{{ b.routineId }}">{% endif %}
+          <button class="btn btn-sm btn-ghost" type="submit">Not today</button>
+        </form>
+      </div>
+      {% elif b.kind == 'event' and not b.isPast %}
+      <div class="row" style="margin-top:8px;">
+        <form hx-post="/blocks/skip" hx-target="#today-root" hx-swap="innerHTML" style="margin:0;">
+          <input type="hidden" name="date" value="{{ date }}">
+          <input type="hidden" name="eventId" value="{{ b.eventId }}">
+          <button class="btn btn-sm btn-ghost" type="submit">Cancel today</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if demo %}
+<p class="hint" style="margin-top:24px;">Running in demo mode &mdash; add Google/Turso/Gemini keys in Settings to go live.</p>
+{% endif %}

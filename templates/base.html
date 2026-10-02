@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{% block title %}Day Planner{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/globals.css" />
+  <link rel="manifest" href="/static/manifest.json" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+  {% block body %}
+  <div class="shell">
+    {% block content %}{% endblock %}
+  </div>
+  {% include "partials/nav.html" %}
+  {% endblock %}
+  <script src="/static/sw-register.js" defer></script>
+</body>
+</html>

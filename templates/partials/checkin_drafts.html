@@ -1,0 +1,40 @@
+{% for d in drafts %}
+<div class="card card-pad">
+  <div class="grid2">
+    <div class="field">
+      <span>Title</span>
+      <input class="input" type="text" name="draft_title" value="{{ d.title }}">
+    </div>
+    <div class="field">
+      <span>Minutes</span>
+      <input class="input" type="number" name="draft_minutes" value="{{ d.minutes }}" min="5" max="1200" step="5">
+    </div>
+  </div>
+  <div class="grid3" style="margin-top:8px;">
+    <div class="field">
+      <span>Priority</span>
+      <select class="select" name="draft_priority">
+        <option value="1" {% if d.priority == 1 %}selected{% endif %}>Low</option>
+        <option value="2" {% if d.priority == 2 %}selected{% endif %}>Medium</option>
+        <option value="3" {% if d.priority == 3 %}selected{% endif %}>High</option>
+        <option value="4" {% if d.priority == 4 %}selected{% endif %}>Must today</option>
+      </select>
+    </div>
+    <div class="field">
+      <span>Where</span>
+      <select class="select" name="draft_where">
+        <option value="anywhere" {% if d.where == 'anywhere' %}selected{% endif %}>Anywhere</option>
+        <option value="home" {% if d.where == 'home' %}selected{% endif %}>Home only</option>
+        <option value="portable" {% if d.where == 'portable' %}selected{% endif %}>Portable</option>
+      </select>
+    </div>
+    <div class="field">
+      <span>Due</span>
+      <input class="input" type="date" name="draft_due" value="{{ d.due or '' }}">
+    </div>
+  </div>
+  <input type="hidden" name="draft_category" value="{{ d.category }}">
+</div>
+{% else %}
+<p class="hint">Nothing parsed yet.</p>
+{% endfor %}

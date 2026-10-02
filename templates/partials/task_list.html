@@ -1,0 +1,24 @@
+<div class="list">
+  {% for t in tasks %}
+  <div class="list-row" data-cat="{{ t.category }}">
+    <span class="dot"></span>
+    <div class="grow">
+      <div style="font-weight:600;">{{ t.title }}{% if t.course %} <span class="chip">{{ t.course }}</span>{% endif %}</div>
+      <div class="hint">
+        {{ t.estimate_min }} min{% if t.spent_min %} &middot; {{ t.spent_min }} min logged{% endif %}
+        {% if t.dueFmt %} &middot; due {{ t.dueFmt }}{% endif %}
+        {% if t.priority == 4 %} &middot; <span class="chip chip-signal">must today</span>{% endif %}
+      </div>
+    </div>
+    <form hx-post="/tasks/{{ t.id }}" hx-target="#task-list" hx-swap="innerHTML" style="margin:0;">
+      <input type="hidden" name="done" value="{{ 'false' if t.done else 'true' }}">
+      <button class="btn btn-sm" type="submit">{{ 'Undo' if t.done else 'Done' }}</button>
+    </form>
+    <form hx-post="/tasks/{{ t.id }}/delete" hx-target="#task-list" hx-swap="innerHTML" style="margin:0;">
+      <button class="btn btn-sm btn-ghost btn-danger" type="submit">Delete</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="empty"><b>Nothing open</b>Add a task above, or run the morning check-in.</div>
+  {% endfor %}
+</div>

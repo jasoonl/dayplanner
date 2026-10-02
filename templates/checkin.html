@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Morning check-in — Day Planner{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <div class="eyebrow">{{ date }}</div>
+    <h1 class="title">Morning check-in</h1>
+  </div>
+  <a class="btn btn-ghost" href="/">Cancel</a>
+</div>
+
+<form hx-post="/checkin" hx-target="body" hx-swap="none" id="checkin-form">
+  <input type="hidden" name="date" value="{{ date }}">
+
+  <div class="h2">Energy</div>
+  <div class="seg" role="group">
+    <button type="button" class="energy-btn" data-val="low" aria-pressed="false">Low</button>
+    <button type="button" class="energy-btn" data-val="ok" aria-pressed="true">OK</button>
+    <button type="button" class="energy-btn" data-val="high" aria-pressed="false">High</button>
+  </div>
+  <input type="hidden" name="energy" id="energy-input" value="ok">
+
+  <div class="h2">What's on your plate?</div>
+  <div class="field">
+    <textarea class="textarea" name="text" id="checkin-text" placeholder="e.g. Unit 3 test Friday, finish essay draft, practice 45 min"
+      hx-post="/checkin/parse" hx-trigger="change, keyup changed delay:800ms" hx-target="#drafts" hx-swap="innerHTML"></textarea>
+    <span class="hint">One task per line. It's parsed into estimates, priority and due dates automatically (Gemini if configured, deterministic rules otherwise).</span>
+  </div>
+
+  <div class="h2">Today's events</div>
+  <div class="list">
+    {% for e in events %}
+    <label class="list-row">
+      <input type="checkbox" name="skipped" value="{{ e.id }}">
+      <span class="grow">{{ e.title }}</span>
+      <span class="hint">skip today</span>
+    </label>
+    {% else %}
+    <div class="list-row muted">No events today.</div>
+    {% endfor %}
+  </div>
+
+  <div class="h2">New tasks</div>
+  <div id="drafts" class="stack"></div>
+
+  <div class="sheet-foot" style="position:sticky; bottom:0;">
+    <button class="btn btn-signal btn-block" type="submit">Build my day</button>
+  </div>
+</form>
+
+<script>
+  document.querySelectorAll('.energy-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.energy-btn').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      document.getElementById('energy-input').value = btn.dataset.val;
+    });
+  });
+  document.body.addEventListener('htmx:afterRequest', (e) => {
+    if (e.detail.elt.id === 'checkin-form' && e.detail.successful) window.location.href = '/';
+  });
+</script>
+{% endblock %}

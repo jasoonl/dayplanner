@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Settings — Day Planner{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <div class="eyebrow">Configuration</div>
+    <h1 class="title">Settings</h1>
+  </div>
+</div>
+
+<div id="toast-slot"></div>
+
+<div class="h2">Status</div>
+<div class="list">
+  <div class="list-row"><span class="status-dot {% if google_connected %}on{% endif %}"></span><span class="grow">Google Calendar</span>
+    {% if google_connected %}<span class="chip chip-ok">Connected</span>{% elif google_configured %}<a class="btn btn-sm" href="/auth/google">Connect</a>{% else %}<span class="hint">Not configured</span>{% endif %}
+  </div>
+  <div class="list-row"><span class="status-dot {% if gemini_configured %}on{% endif %}"></span><span class="grow">Gemini AI</span>
+    <span class="hint">{% if gemini_configured %}Live{% else %}Rule-based fallback{% endif %}</span>
+  </div>
+  <div class="list-row"><span class="status-dot {% if push_ready %}on{% endif %}"></span><span class="grow">Push notifications</span>
+    {% if push_ready %}<button class="btn btn-sm" hx-post="/push/test" hx-swap="none">Send test</button>{% else %}<span class="hint">Not configured</span>{% endif %}
+  </div>
+  {% if demo %}
+  <div class="list-row"><span class="grow hint">Demo mode &mdash; sample data, no external services.</span></div>
+  {% endif %}
+</div>
+
+<div class="h2">Planner</div>
+<form hx-post="/settings" hx-target="#toast-slot" hx-swap="innerHTML" class="stack card card-pad">
+  <div class="grid2">
+    <div class="field"><span>Timezone</span><input class="input" name="timezone" value="{{ settings.timezone }}"></div>
+    <div class="field"><span>Check-in time</span><input class="input" type="time" name="checkinTime" value="{{ settings.checkinTime }}"></div>
+  </div>
+  <div class="grid3">
+    <div class="field"><span>Focus block (min)</span><input class="input" type="number" name="focusMin" value="{{ settings.focusMin }}"></div>
+    <div class="field"><span>Break (min)</span><input class="input" type="number" name="breakMin" value="{{ settings.breakMin }}"></div>
+    <div class="field"><span>Max work/day (min)</span><input class="input" type="number" name="maxWorkMinPerDay" value="{{ settings.maxWorkMinPerDay }}"></div>
+  </div>
+  <div class="grid3">
+    <div class="field"><span>Morning routine (min)</span><input class="input" type="number" name="morningRoutineMin" value="{{ settings.morningRoutineMin }}"></div>
+    <div class="field"><span>Wind-down (min)</span><input class="input" type="number" name="windDownMin" value="{{ settings.windDownMin }}"></div>
+    <div class="field"><span>Look-ahead (days)</span><input class="input" type="number" name="lookaheadDays" value="{{ settings.lookaheadDays }}"></div>
+  </div>
+  <div class="grid2">
+    <div class="field"><span>Travel mode</span>
+      <select class="select" name="travelMode">
+        {% for m in ['TRANSIT', 'DRIVE', 'WALK', 'BICYCLE'] %}
+        <option value="{{ m }}" {% if settings.travelMode == m %}selected{% endif %}>{{ m.title() }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><span>Fallback travel (min)</span><input class="input" type="number" name="defaultTravelMin" value="{{ settings.defaultTravelMin }}"></div>
+  </div>
+  <label class="row"><input type="checkbox" name="autoPublish" {% if settings.autoPublish %}checked{% endif %}> <span>Auto-publish plan to Google Calendar</span></label>
+  <button class="btn btn-primary" type="submit">Save</button>
+</form>
+
+<div class="h2">Places</div>
+<div id="places-list">{% include "partials/places_list.html" %}</div>
+<details class="card card-pad" style="margin-top:8px;">
+  <summary style="cursor:pointer; font-weight:600;">Add a place</summary>
+  <form hx-post="/places" hx-target="#places-list" hx-swap="innerHTML" class="stack" style="margin-top:12px;">
+    <div class="field"><span>Name</span><input class="input" name="name" required></div>
+    <div class="field"><span>Address</span><input class="input" name="address" required></div>
+    <div class="field"><span>Aliases (comma separated)</span><input class="input" name="aliases"></div>
+    <label class="row"><input type="checkbox" name="isHome"> <span>This is home</span></label>
+    <button class="btn btn-primary" type="submit">Add place</button>
+  </form>
+</details>
+
+<div class="h2">Feeds</div>
+<div id="sources-list">{% include "partials/sources_list.html" %}</div>
+<details class="card card-pad" style="margin-top:8px;">
+  <summary style="cursor:pointer; font-weight:600;">Add a feed</summary>
+  <form hx-post="/sources" hx-target="#sources-list" hx-swap="innerHTML" class="stack" style="margin-top:12px;">
+    <div class="field"><span>Label</span><input class="input" name="label" required></div>
+    <div class="field"><span>Kind</span>
+      <select class="select" name="kind"><option value="ics">ICS URL</option><option value="canvas_api">Canvas API</option></select>
+    </div>
+    <div class="field"><span>URL</span><input class="input" name="url" placeholder="https://..."></div>
+    <div class="field"><span>Role</span>
+      <select class="select" name="role"><option value="auto">Auto-detect</option><option value="events">Events</option><option value="assignments">Assignments</option></select>
+    </div>
+    <button class="btn btn-primary" type="submit">Add feed</button>
+  </form>
+  <form hx-post="/sources/test" hx-target="#toast-slot" hx-swap="innerHTML" class="row" style="margin-top:12px;">
+    <input class="input" name="url" placeholder="Test a feed URL">
+    <button class="btn btn-sm" type="submit">Test</button>
+  </form>
+</details>
+
+<div class="h2">Routines</div>
+<div id="routines-list">{% include "partials/routines_list.html" %}</div>
+{% endblock %}

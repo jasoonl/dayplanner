@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Tasks — Day Planner{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <div class="eyebrow">Everything open</div>
+    <h1 class="title">Tasks</h1>
+  </div>
+</div>
+
+<details class="card card-pad" style="margin-bottom:16px;">
+  <summary style="cursor:pointer; font-weight:600;">Add a task</summary>
+  <form hx-post="/tasks" hx-target="#task-list" hx-swap="innerHTML" class="stack" style="margin-top:12px;">
+    <div class="field"><span>Title</span><input class="input" name="title" required></div>
+    <div class="grid3">
+      <div class="field"><span>Minutes</span><input class="input" type="number" name="minutes" value="30" min="5" max="1200" step="5"></div>
+      <div class="field"><span>Priority</span>
+        <select class="select" name="priority">
+          <option value="1">Low</option><option value="2" selected>Medium</option><option value="3">High</option><option value="4">Must today</option>
+        </select>
+      </div>
+      <div class="field"><span>Where</span>
+        <select class="select" name="where">
+          <option value="anywhere" selected>Anywhere</option><option value="home">Home only</option><option value="portable">Portable</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field"><span>Category</span>
+        <select class="select" name="category">
+          <option value="school">School</option><option value="music">Music</option><option value="activity">Activity</option>
+          <option value="personal" selected>Personal</option><option value="work">Work</option>
+        </select>
+      </div>
+      <div class="field"><span>Due</span><input class="input" type="date" name="due"></div>
+    </div>
+    <button class="btn btn-signal btn-block" type="submit">Add task</button>
+  </form>
+</details>
+
+<div id="task-list">
+  {% include "partials/task_list.html" %}
+</div>
+{% endblock %}

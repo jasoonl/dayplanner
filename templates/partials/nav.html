@@ -1,0 +1,8 @@
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" {% if active_nav == 'today' %}aria-current="page"{% endif %}>Today</a>
+    <a href="/tasks" {% if active_nav == 'tasks' %}aria-current="page"{% endif %}>Tasks</a>
+    <a href="/week" {% if active_nav == 'week' %}aria-current="page"{% endif %}>Week</a>
+    <a href="/settings" {% if active_nav == 'settings' %}aria-current="page"{% endif %}>Settings</a>
+  </div>
+</nav>

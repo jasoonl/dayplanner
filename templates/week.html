@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Week — Day Planner{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <div class="eyebrow">Look-ahead</div>
+    <h1 class="title">Week</h1>
+  </div>
+</div>
+
+{% if due_soon_count > 0 %}
+<div class="warnings"><div class="warn">{{ due_soon_count }} task(s) due soon.</div></div>
+{% endif %}
+
+<div class="list">
+  {% for d in week %}
+  <div class="week-row">
+    <div class="d">{{ d.weekday }}<small>{{ d.monthDay }}</small></div>
+    <div>
+      <div class="bar"><i class="{% if d.overload %}over{% endif %}" style="width:{{ d.pct }}%"></i></div>
+      <div class="hint" style="margin-top:4px;">{{ d.allocatedMin }} / {{ d.capacityMin | round | int }} min planned</div>
+    </div>
+    <div class="hint" style="text-align:right;">{{ d.eventMin }}m events</div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if at_risk %}
+<div class="h2">At risk</div>
+<div class="list">
+  {% for a in at_risk %}
+  <div class="list-row"><span class="grow">{{ a.taskId }}</span><span class="chip chip-signal">+{{ a.shortfallMin | round | int }}m</span></div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
